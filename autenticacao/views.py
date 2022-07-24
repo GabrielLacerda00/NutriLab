@@ -31,3 +31,18 @@ def cadastro(request):
           messages.add_message(request,constants.error, 'Erro interno do sistema')       
           return redirect('/auth/cadastro') 
 
+def logar(request):
+    if request.method == 'GET':
+      return render(request, 'logar.html')
+    elif request.method == 'POST':
+      username = request.POST.get('username')
+      senha = request.POST.get('senha')
+      
+      usuario = auth.authenticate(username=username, password=senha)
+      
+      if not usuario:
+            messages.add_message(request, constants.ERROR, 'Username ou senha inválidos')
+            return redirect('/auth/logar')
+      else:
+            auth.login(request, usuario)
+            return redirect('/')
