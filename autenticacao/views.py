@@ -1,10 +1,14 @@
 from django.shortcuts import render
 from django.http import HttpResponse
-from .utils import password_is_valid
+from .utils import password_is_valid, email_html
 from django.shortcuts import redirect
 from django.contrib.auth.models import User
 from django.contrib.messages import constants
 from django.contrib import messages
+from django.contrib import auth
+import os
+from django.conf import settings
+
 
 def cadastro(request):
   
@@ -25,14 +29,18 @@ def cadastro(request):
                                           password=senha,
                                           is_active=False)
           user.save()
-          messages.add_message(request,constants.error, 'Usuário cadastrado com sucesso') 
-          return redirect('/auth/logar')
+          path_template = os.path.join(settings.BASE_DIR, 'autenticacao/templates/emails/cadastro_confirmado.html')
+          email_html(path_template, 'Cadastro confirmado', [email,], username=username)
+          messages.add_message(request,constants.SUCCESS, 'Usuário cadastrado com sucesso')
+          return redirect('/auth/logar') 
       except:
-          messages.add_message(request,constants.error, 'Erro interno do sistema')       
+          messages.add_message(request,constants.ERROR, 'Erro interno do sistema')       
           return redirect('/auth/cadastro') 
 
 def logar(request):
     if request.method == 'GET':
+      if request.user.is_authenticated:
+        return redirect('/')
       return render(request, 'logar.html')
     elif request.method == 'POST':
       username = request.POST.get('username')
@@ -46,3 +54,9 @@ def logar(request):
       else:
             auth.login(request, usuario)
             return redirect('/')
+
+def sair(request):
+    auth.logout(request)
+    return redirect('/auth/logar')
+
+
