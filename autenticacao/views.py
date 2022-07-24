@@ -4,7 +4,7 @@ from .utils import password_is_valid
 from django.shortcuts import redirect
 from django.contrib.auth.models import User
 from django.contrib.messages import constants
-from django.contrib.messages import messages
+from django.contrib import messages
 
 def cadastro(request):
   
@@ -30,8 +30,4 @@ def cadastro(request):
       except:
           messages.add_message(request,constants.error, 'Erro interno do sistema')       
           return redirect('/auth/cadastro') 
-        
-    
 
-def logar(request):
-      return HttpResponse("Você está na página de login")
